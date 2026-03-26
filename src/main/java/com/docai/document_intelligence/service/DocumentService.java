@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
@@ -65,5 +66,45 @@ public class DocumentService {
 
     public Optional<Document> getDocument(Long id) {
         return documentRepository.findById(id);
+    }
+
+    public void deleteDocument(Long id) {
+        Document doc = documentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        // Delete from S3
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+            .bucket(bucket)
+            .key(doc.getS3Key())
+            .build());
+
+        // Delete from database
+        documentRepository.deleteById(id);
+        log.info("Document deleted: {}", doc.getS3Key());
+    }
+
+    public int deleteAllDocuments() {
+        List<Document> allDocs = documentRepository.findAll();
+        int count = 0;
+
+        for (Document doc : allDocs) {
+            try {
+                // Delete from S3
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(doc.getS3Key())
+                    .build());
+
+                // Delete from database
+                documentRepository.delete(doc);
+                count++;
+                log.info("Document deleted: {}", doc.getS3Key());
+            } catch (Exception e) {
+                log.error("Failed to delete document {}: {}", doc.getId(), e.getMessage());
+            }
+        }
+
+        log.info("Bulk delete completed. Deleted {} documents", count);
+        return count;
     }
 }
