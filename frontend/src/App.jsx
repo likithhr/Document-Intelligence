@@ -291,7 +291,7 @@ function HeroSection() {
               <Icon.Play className="w-4 h-4 mr-2" />
               Try It Now
             </a>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="btn-ghost">
+            <a href="https://github.com/likithhr/Document-Intelligence" target="_blank" rel="noreferrer" className="btn-ghost">
               <Icon.Github className="w-4 h-4 mr-2" />
               View on GitHub
               <Icon.ArrowRight className="w-4 h-4 ml-2" />
