@@ -23,9 +23,7 @@ aws:
   sqs:
     queue-url: https://sqs.us-east-1.amazonaws.com/307946677769/docai-processing-queue
   bedrock:
-    model-id: anthropic.claude-3-haiku-20240307-v1:0
-
-server:
+    model-id: us.anthropic.claude-haiku-4-5-20251001-v1:0
   port: 8080
 
 logging:
