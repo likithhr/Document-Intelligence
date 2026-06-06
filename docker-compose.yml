@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  app:
+    build: .
+    container_name: docai-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ~/.aws:/root/.aws:ro
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - DB_HOST=docai-db.c4jskea402jt.us-east-1.rds.amazonaws.com
+      - DB_USER=adminuser
+      - DB_PASS=DocAI#2024
+      - S3_BUCKET=docai-documents-307946677769
+      - SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/307946677769/docai-processing-queue
+    depends_on:
+      - db
+
   db:
     image: postgres:15-alpine
     container_name: docai-postgres
